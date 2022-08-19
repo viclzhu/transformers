@@ -61,6 +61,31 @@ if is_torch_tpu_available(check_device=False):
 if is_sagemaker_mp_enabled():
     import smdistributed.modelparallel.torch as smp
 
+    # TODO: testing
+
+    # smp_config = {
+    #     "ddp": True,
+    #     "tensor_parallel_degree": 8,
+    #     "pipeline_parallel_degree": 1,
+    #     "microbatches": 2,
+    #     "shard_optimizer_state": True,
+    #     "prescaled_batch": False,
+    #     "fp16": True,
+    #     "bf16": False,
+    #     "offload_activations": False,
+    #     "delayed_parameter_initialization": True,
+    #     "optimize": "speed",
+    #     "placement_strategy": "cluster",
+    #     "activation_loading_horizon": 4,
+    #     "skip_tracing": False,
+    #     "auto_partition": True,
+    #     "default_partition": 0,
+    #     "static_mode": False,
+    #     "fast_mode": False,
+    #     "sharded_data_parallel_degree": 1
+    # }
+
+    # smp.init(smp_config)
     smp.init()
 
 

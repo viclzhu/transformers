@@ -1058,9 +1058,18 @@ if is_sagemaker_mp_enabled():
 
     @smp.step()
     def smp_forward_backward(model, inputs, gradient_accumulation_steps=1):
+        print("*+* in smp_forward_backward")
         outputs = model(**inputs)
+        print("*+* outputs:", outputs)
+        if isinstance(outputs, dict):
+            print("*+* OUTPUT is dict")
+        else:
+            print("*+* OUTPUT is NOT dict")
         loss = outputs["loss"] if isinstance(outputs, dict) else outputs[0]
+        print("*+* loss:", loss)
+        print("*+* gradient_acc:", gradient_accumulation_steps)
         loss /= gradient_accumulation_steps
+        print("*+* loss_after:", loss)
         model.backward(loss)
         return loss
 

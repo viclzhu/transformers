@@ -760,6 +760,11 @@ class Trainer:
         if self.train_dataset is None or not has_length(self.train_dataset):
             return None
 
+        print("*+* world_size:", self.args.world_size)
+        print("*+* process_index:", self.args.process_index)
+        print("*+* dataloader_num_workers:", self.args.dataloader_num_workers)
+        print("*+* dataloader_pin_memory:", self.args.dataloader_pin_memory)
+
         generator = None
         if self.args.world_size <= 1 and _is_torch_generator_available:
             generator = torch.Generator()
@@ -1740,8 +1745,10 @@ class Trainer:
                     # Avoid unnecessary DDP synchronization since there will be no backward pass on this example.
                     with model.no_sync():
                         tr_loss_step = self.training_step(model, inputs)
+                        print("*+* 1 tr_loss_step:", tr_loss_step)
                 else:
                     tr_loss_step = self.training_step(model, inputs)
+                    print("*+* 2 tr_loss_step:", tr_loss_step)
 
                 if (
                     args.logging_nan_inf_filter
@@ -1749,8 +1756,10 @@ class Trainer:
                     and (torch.isnan(tr_loss_step) or torch.isinf(tr_loss_step))
                 ):
                     # if loss is nan or inf simply add the average of previous logged losses
+                    print("*+* 1_tr_loss:", tr_loss / (1 + self.state.global_step - self._globalstep_last_logged))
                     tr_loss += tr_loss / (1 + self.state.global_step - self._globalstep_last_logged)
                 else:
+                    print("*+* 2 tr_loss (tr_loss_step):", tr_loss_step)
                     tr_loss += tr_loss_step
 
                 self.current_flos += float(self.floating_point_ops(inputs))
@@ -1865,7 +1874,10 @@ class Trainer:
 
         # add remaining tr_loss
         self._total_loss_scalar += tr_loss.item()
+        # print("*+* total_loss_scalar:", self._total_loss_scalar)
+        # print("*+* state.global_step:", self.state.global_step)
         train_loss = self._total_loss_scalar / self.state.global_step
+        # print("*+* train_loss:", train_loss)
 
         metrics = speed_metrics("train", start_time, num_samples=num_train_samples, num_steps=self.state.max_steps)
         self.store_flos()
@@ -2465,7 +2477,7 @@ class Trainer:
         """
         model.train()
         inputs = self._prepare_inputs(inputs)
-
+        print("*+* In training step inputs:", inputs)
         if is_sagemaker_mp_enabled():
             loss_mb = smp_forward_backward(model, inputs, self.args.gradient_accumulation_steps)
             return loss_mb.reduce_mean().detach().to(self.args.device)
