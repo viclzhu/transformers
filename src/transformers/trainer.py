@@ -190,10 +190,13 @@ if is_sagemaker_mp_enabled():
     from smdistributed.modelparallel import __version__ as SMP_VERSION
 
     IS_SAGEMAKER_MP_POST_1_10 = version.parse(SMP_VERSION) >= version.parse("1.10")
-    IS_SAGEMAKER_MP_POST_1_15 = version.parse(SMP_VERSION) >= version.parse("1.15")
+    IS_SAGEMAKER_MP_POST_1_15 = version.parse(SMP_VERSION) >= version.parse("1.15rc")
+    print(f"[viczhu] {SMP_VERSION} | {IS_SAGEMAKER_MP_POST_1_15}")
 
     from .trainer_pt_utils import smp_forward_backward, smp_forward_only, smp_gather, smp_nested_concat
 else:
+    print(f"[viczhu] FALSE ?")
+
     IS_SAGEMAKER_MP_POST_1_10 = False
     IS_SAGEMAKER_MP_POST_1_15 = False
 
