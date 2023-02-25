@@ -1674,11 +1674,22 @@ class Trainer:
             self.model.gradient_checkpointing_enable()
 
         model = self._wrap_model(self.model_wrapped)
+            
 
         # for the rest of this function `model` is the outside model, whether it was wrapped or not
         if model is not self.model:
             self.model_wrapped = model
 
+        # TODO: add 
+        if IS_SAGEMAKER_MP_POST_1_15:
+            m = self.model_wrapped.get_module()
+            # temporary hard code for act. checkpointing for specific models
+            # gpt2, bloom, gpt_neo
+            transformer_layers = m.transformer.h
+            for c in transformer_layers.children():  # pylint: disable=invalid-name
+                # TODO: figure out better way of setting
+                smp.set_activation_checkpointing(c)
+            
         if delay_optimizer_creation:
             self.create_optimizer_and_scheduler(num_training_steps=max_steps)
 
