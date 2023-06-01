@@ -1052,6 +1052,15 @@ class Trainer:
         """
         opt_model = self.model_wrapped if is_sagemaker_mp_enabled() else self.model
 
+        print(f"[viczhu] in create_optimizer() is_sagemaker_mp_enabled() - {is_sagemaker_mp_enabled()}")
+        print(f"[viczhu] in create_optimizer() opt_model - {opt_model}")
+        print(f"[viczhu] in create_optimizer() model - {self.model}")
+
+        import traceback
+        from pprint import pprint
+
+        pprint(f"[viczhu][test] {traceback.extract_stack()}")
+
         if self.optimizer is None:
             decay_parameters = get_parameter_names(opt_model, ALL_LAYERNORM_LAYERS)
             decay_parameters = [name for name in decay_parameters if "bias" not in name]
